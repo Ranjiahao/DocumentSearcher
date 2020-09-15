@@ -39,6 +39,10 @@ bool Index::Build(const std::string& input_path) {
             continue;
         }
         BuildInverted(*doc_info);
+        // 每构建100个索引打印一次，减少与磁盘的交互频率
+        if (doc_info->doc_id % 100 == 0) {
+            std::cerr << doc_info->doc_id << std::endl;
+        }
     }
     file.close();
     return true;

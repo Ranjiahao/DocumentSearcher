@@ -52,4 +52,27 @@ private:
     std::unordered_map<std::string, InvertedList> inverted_index;
     cppjieba::Jieba jieba;
 };
+
+
+
+/*
+ * 搜索模块
+ * */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 } // namespace searcher

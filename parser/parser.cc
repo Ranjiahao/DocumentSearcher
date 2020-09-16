@@ -57,7 +57,7 @@ bool ParseTitle(const std::string& html, std::string* title) {
         std::cerr << "标题位置不合法！" << std::endl;
         return false;
     }
-    *title = std::string(html.begin() + beg, html.begin() + end);
+    *title = std::string(html, end - beg);
     return true;
 }
 

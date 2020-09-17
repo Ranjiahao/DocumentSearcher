@@ -1,7 +1,16 @@
 #include "searcher.h"
 #include "../common/util.hpp"
+#include <algorithm>
+#include <boost/algorithm/string/case_conv.hpp>
+#include <jsoncpp/json/json.h>
+#include <jsoncpp/json/value.h>
+#include <jsoncpp/json/writer.h>
 
 namespace searcher {
+/*
+ * Index模块
+ */
+
 const char* const DICT_PATH = "../jieba_dict/jieba.dict.utf8";    
 const char* const HMM_PATH = "../jieba_dict/hmm_model.utf8";    
 const char* const USER_DICT_PATH = "../jieba_dict/user.dict.utf8";    
@@ -100,5 +109,80 @@ void Index::BuildInverted(const DocInfo& doc_info) {
 
 void Index::CutWord(const std::string& input, std::vector<std::string>* output) {
     jieba.CutForSearch(input, *output);
+}
+
+
+
+/*
+ * Searcher模块
+ */
+
+bool Searcher::Init(const std::string& input_path) {
+    return index->Build(input_path);
+}
+
+bool Searcher::Search(const std::string& query, std::string* output) {
+    // 对查询词进行分词
+    std::vector<std::string> tokens;
+    index->CutWord(query, &tokens);
+    // 根据分词结果查倒排，并将倒排拉链合并在all_token_result中
+    InvertedList all_token_result;
+    for (auto word : tokens) {
+        boost::to_lower(word);
+        const InvertedList* inverted_list = index->GetInvertedList(word);
+        if (inverted_list == nullptr) {
+            // 该词在倒排索引中不存在
+            continue;
+        }
+        all_token_result.insert(all_token_result.end(), inverted_list->begin(), inverted_list->end());
+    }
+    // 根据权重进行降序排序
+    std::sort(all_token_result.begin(), all_token_result.end(), [](const Weight& w1, const Weight& w2) {
+        return w1.weight > w2.weight;
+    });
+    // 根据倒排拉链中的文档id，查正排
+    // 将doc_info中的内容构造成json格式
+    Json::Value results;
+    for (const auto& weight : all_token_result) {
+        const DocInfo* doc_info = index->GetDocInfo(weight.doc_id);
+        Json::Value result;
+        result["title"] = doc_info->title;
+        result["url"] = doc_info->url;
+        result["desc"] = GenerateDesc(doc_info->content, weight.word);
+        results.append(result);
+    }
+    // 将json对象results序列化成字符串，写入output中
+    Json::FastWriter writer;
+    *output = writer.write(results);
+    return true;
+}
+
+std::string Searcher::GenerateDesc(const std::string& content, const std::string& word) {
+    // 找到word在正文中出现的位置
+    size_t first_pos = content.find(word);
+    size_t desc_beg = 0;
+    if (first_pos == std::string::npos) {
+        // word只出现再标题中
+        if (content.size() < 160) {
+            return content;
+        }
+        std::string desc(content, 0, 160);
+        desc[desc.size() - 1] = '.';
+        desc[desc.size() - 2] = '.';
+        desc[desc.size() - 3] = '.';
+        return desc;
+    }
+    // 找到了first_pos位置
+    desc_beg = first_pos < 60 ? 0 : first_pos - 60;
+    if (desc_beg + 160 >= content.size()) {
+        // desc_beg后面的内容不够160直接移动到末尾即可
+        return std::string(content, desc_beg);
+    } else {
+        std::string desc(content, desc_beg, 160);
+        desc[desc.size() - 1] = '.';
+        desc[desc.size() - 2] = '.';
+        desc[desc.size() - 3] = '.';
+        return desc;
+    }
 }
 } // namespace searcher

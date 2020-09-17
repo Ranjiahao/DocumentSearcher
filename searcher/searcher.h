@@ -59,20 +59,15 @@ private:
  * 搜索模块
  * */
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+class Searcher {
+public:
+    Searcher()
+        : index(new Index()) {}
+    bool Init(const std::string& input_path);
+    bool Search(const std::string& query, std::string* results);
+private:
+    Index* index;
+    // 生成文章描述
+    std::string GenerateDesc(const std::string& content, const std::string& word);
+};
 } // namespace searcher

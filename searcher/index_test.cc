@@ -4,7 +4,7 @@ int main() {
     searcher::Index index;
     bool ret = index.Build("../data/tmp/raw_input");
     if (!ret) {
-        std::cout << "索引构建失败" << std::endl;
+        std::cout << "索引构建失败！" << std::endl;
         return 1;
     }
     const searcher::InvertedList* inverted_list = index.GetInvertedList("filesystem");

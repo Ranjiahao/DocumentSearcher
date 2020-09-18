@@ -1,10 +1,10 @@
-#include "searcher.h"
-#include "../common/util.hpp"
 #include <algorithm>
 #include <boost/algorithm/string/case_conv.hpp>
 #include <jsoncpp/json/json.h>
 #include <jsoncpp/json/value.h>
 #include <jsoncpp/json/writer.h>
+#include "searcher.h"
+#include "../common/util.hpp"
 
 namespace searcher {
 /*

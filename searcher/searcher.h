@@ -1,7 +1,7 @@
 #pragma once
 
-#include <string>
 #include <stdint.h>
+#include <string>
 #include <vector>
 #include <unordered_map>
 #include "cppjieba/Jieba.hpp"

@@ -53,11 +53,7 @@ bool ParseTitle(const std::string& html, std::string* title) {
         return false;
     }
     beg += std::string("<title>").size();
-    if (beg > end) {
-        std::cerr << "标题位置不合法！" << std::endl;
-        return false;
-    }
-    *title = std::string(html, end - beg);
+    *title = std::string(html, beg, end - beg);
     return true;
 }
 
@@ -66,7 +62,7 @@ bool ParseTitle(const std::string& html, std::string* title) {
 // 在线路径: https://www.boost.org/doc/libs/1_53_0/doc/html/xxx.html
 bool ParseUrl(const std::string& file_path, std::string* url) {
     std::string url_head = "https://www.boost.org/doc/libs/1_53_0/doc/";
-    std::string url_tail = std::string(file_path.begin() + g_input_path.size(), file_path.end());
+    std::string url_tail = std::string(file_path, g_input_path.size());
     *url = url_head + url_tail;
     return true;
 }

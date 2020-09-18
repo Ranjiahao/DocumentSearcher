@@ -1,5 +1,5 @@
-#include "searcher.h"
 #include <iostream>
+#include "searcher.h"
 
 int main() {
     searcher::Searcher searcher;
@@ -14,7 +14,6 @@ int main() {
         std::cin >> query;
         if (!std::cin.good()) {
             // 读到 EOF
-            std::cout << "goodbye!" << std::endl;
             break;
         }
         std::string results;

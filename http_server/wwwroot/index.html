@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boost文档搜索</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            height: 100%;
+            background-color: #f3f3f3;
+        }
+
+        .container {
+            width: 720px;
+            height: 100%;
+            margin: 0 auto;
+            overflow: auto;
+            background-color: #fff;
+        }
+
+        .header {
+            width: 100%;
+            height: 50px;
+        }
+
+        .header input {
+            width: 600px;
+            height: 50px;
+            font-size: 23px;
+            padding-left: 10px;
+            float: left;
+            border-right: none;
+        }
+
+        .header button {
+            width: 100px;
+            height: 50px;
+            font-size: 23px;
+            float: left;
+            color: #fff;
+            background-color: rgb(0, 128, 255);
+        }
+
+        .item {
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .item a {
+            display: block;
+            width: 100%;
+            height: 40px;
+            font-size: 23px;
+            line-height: 40px;
+            font-weight: 700;
+            text-decoration: none;
+            color: rgb(0, 128, 255);
+        }
+
+        .item p {
+            font-size: 16px;
+            color: #333333;
+        }
+
+        .item i {
+            font-size: 16px;
+            font-style: normal;
+            color: rgb(0, 128, 0);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- 搜索框+搜索按钮 -->
+        <div class="header">
+            <!-- 搜索框 -->
+            <input type="search">
+            <!-- 搜索按钮 -->
+            <button onclick="search()">search</button>
+        </div>
+        <!-- 搜索结果 -->
+        <div class="result">
+        </div>
+    </div>
+    <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+    <script>
+        function search() {
+            // 获取到搜索框中的查询词
+            let query = $(".header input").val();
+            // 构造HTTP请求发送给服务器
+            $.ajax({
+                type: "get",
+                url: "searcher?query=" + query,
+                success: function (data, status) {
+                    buildResult(data);
+                }
+            });
+        }
+        // 用json对象data构造html
+        function buildResult(data) {
+            // 获取result标签对应的对象
+            let result = $(".result");
+            // 清除result中上次搜索结果
+            result.empty();
+            for (let item of data) {
+                // 构造a标签作为标题
+                let title = $("<a>", {
+                    // 标签的文本内容就是item的标题
+                    text: item.title,
+                    // 标签点击后要跳转到对应的路径
+                    href: item.url,
+                    // 点击a标签时用新标签页打开
+                    target: "_blank",
+                });
+                // 构造p标签作为描述
+                let desc = $("<p>", {
+                    text: item.desc,
+                });
+                // 构造i标签作为url
+                let showUrl = $("<i>", {
+                    text: item.url,
+                });
+                // 加入到item标签中
+                let itemHtml = $("<div>", {
+                    class: "item",
+                });
+                title.appendTo(itemHtml);
+                desc.appendTo(itemHtml);
+                showUrl.appendTo(itemHtml);
+                // 把item标签加入到result标签中
+                itemHtml.appendTo(result);
+            }
+        }
+    </script>
+</body>
+
+</html>

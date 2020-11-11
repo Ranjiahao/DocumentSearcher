@@ -19,6 +19,7 @@ const char* const STOP_WORD_PATH = "../jieba_dict/stop_words.utf8";
 
 Index::Index()
     : jieba(DICT_PATH, HMM_PATH, USER_DICT_PATH, IDF_PATH, STOP_WORD_PATH) {}
+
 const DocInfo* Index::GetDocInfo(int64_t doc_id) {
     if (doc_id < 0 || (size_t)doc_id >= forward_index.size()) {
         return nullptr;
